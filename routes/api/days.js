@@ -7,30 +7,61 @@ var Activity = models.Activity;
 var Day = models.Day;
 var Promise = require('bluebird');
 
-router.get('/:dayNum',function(req, res, next){
+router.get('/days/:dayNum',function(req, res, next){
   var dayNum = req.params.dayNum;
   Day.findOne({number: dayNum}, function(err, day){
     if(err) res.send(err.message);
-    else if(!day) res.send('No day found')
+    else if(!day) res.send('No day found');
     else {
-      res.send(day)
-      console.log('Finding One')
+      res.send(day);
     }
-  })
-})
+  });
+});
+
+router.get('/attractions/',function(req, res, next){
+  var attractions = {};
+
+  var hotelPromise = Hotel.find({}, function(err, hotels){
+    if(err) res.send(err.message);
+    else {
+      console.log(hotels);
+      attractions.hotels = (hotels);
+    }
+  });
+
+  var restaurantPromise = Restaurant.find({}, function(err, restaurants){
+    if(err) res.send(err.message);
+    else {
+      attractions.restaurants = restaurants;
+    }
+  });
+
+  var activityPromise = Activity.find({}, function(err, activities){
+    if(err) res.send(err.message);
+    else {
+      attractions.activities = activities;
+    }
+  });
+
+  Promise.all([hotelPromise, restaurantPromise, activityPromise]).then(function(){
+    res.send(attractions);
+  }).then(null, function(err){
+    res.send(err.message);
+  });
+});
 
 
-router.post('/:dayNum',function(req, res, next){
+router.post('/days/:dayNum',function(req, res, next){
   Day.create({number: req.params.dayNum})
   .then(function(day){
-    res.send(day)
+    res.send(day);
   })
   .then(null, function(err){
     res.send(err.message);
-  })
-})
+  });
+});
 
-router.put('/:dayNum/:itemType',function(req, res, next){
+router.put('/days/:dayNum/:itemType',function(req, res, next){
   var itemType = req.params.itemType;
   Day.findOne({number: req.params.dayNum}, function(err, day){
     if(err) res.send(err.message);
@@ -46,14 +77,14 @@ router.put('/:dayNum/:itemType',function(req, res, next){
         res.send(day);
       });
     }
-  })
-})
+  });
+});
 
-router.delete('/:dayNum',function(req, res, next){
+router.delete('/days/:dayNum',function(req, res, next){
   Day.remove({number: req.params.dayNum}, function(err){
     if(err) res.send(err.message);
     else res.send("Removed day: ", req.params.dayNum);
-  })
-})
+  });
+});
 
 module.exports = router;

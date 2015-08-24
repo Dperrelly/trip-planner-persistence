@@ -3,11 +3,20 @@
 
 $(document).ready(function() {
 
-  var attractionsByType = {
-    hotels:      all_hotels,
-    restaurants: all_restaurants,
-    activities:  all_activities
-  };
+  var attractionsByType = {};
+  //   hotels:      all_hotels,
+  //   restaurants: all_restaurants,
+  //   activities:  all_activities
+  // };
+
+  $.get('/api/attractions/', function(attractions){
+    attractionsByType.hotels = attractions.hotels;
+    attractionsByType.restaurants = attractions.restaurants;
+    attractionsByType.activities = attractions.activities;
+    console.log(attractionsByType);
+  }).fail(function(err){
+    console.log('failure');
+  });
 
   function findByTypeAndId (type, id) {
     var attractions = attractionsByType[type],

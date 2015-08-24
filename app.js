@@ -32,7 +32,7 @@ app.use(
 app.use(express.static(__dirname + '/public'));
 
 // serve routes
-app.use('/days', require('./routes/api/days.js'));
+app.use('/api', require('./routes/api/days.js'));
 //console.log('Days: ' + require('./routes/api/days.js'), 'Default : ' + require('./routes'))
 app.use('/', require('./routes'));
 
