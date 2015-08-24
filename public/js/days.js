@@ -1,7 +1,39 @@
 'use strict';
 /* global $ mapModule */
 
-var daysModule = function(){
+var exports = {},
+    days,
+    currentDay;
+
+var daysModule;
+
+$.get('/api/days', function(data){
+  if(!data.length) {
+     $.post('/api/days/0', function(day0){
+        days = data;
+        data.push(day0);
+        days.forEach(function(day){
+          if(!day.hotel) day.hotel = [];
+          else day.hotel = [day.hotel];
+        });
+        daysModule = daysModule();
+        currentDay = days[0];
+    }).fail(function(err){
+        console.log(err.message);
+    });
+  }
+  else {
+    days = data;
+    days.forEach(function(day){
+      if(!day.hotel) day.hotel = [];
+      else day.hotel = [day.hotel];
+    });
+    currentDay = days[0];
+  }
+
+
+
+daysModule = (function(){
 
 
 
@@ -11,10 +43,10 @@ var daysModule = function(){
       restaurants: [],
       activities: []
     });
-    $.post('/api/days/' + String(days.length -1), function(req,res,next){
-      console.log('successsss');
+    $.post('/api/days/' + String(days.length -1), function(data){
+      console.log('data ', data);
     }).fail(function(err){
-      console.log(':(');
+      console.log(':( ', err.message);
     });
     renderDayButtons();
     switchDay(days.length - 1);
@@ -34,7 +66,7 @@ var daysModule = function(){
     if (days.length === 1) return;
     var currentDayNum = $("#day-title span").text().slice(-1) -1;
     $.ajax( {
-      url: '/api/days/' + currentDayNum,
+      url: '/api/days/' + String(currentDayNum),
       method: 'DELETE',
       success: function(data){
         console.log('gj');
@@ -63,7 +95,6 @@ var daysModule = function(){
 
   exports.addAttraction = function(attraction) {
 
-    //console.log(currentDay);
     var currentDayNum = $("#day-title span").text().slice(-1) -1;
     $.post('/api/days/'+currentDayNum+'/'+attraction.type, attraction)
     .done(function(data){
@@ -72,6 +103,7 @@ var daysModule = function(){
       console.log(attraction);
       if (currentDay[attractionType].indexOf(attraction) !== -1) return;
       currentDay[attractionType].push(attraction);
+    console.log('currday', currentDay);
       renderDay(currentDay);
     })
     .fail(function(err){
@@ -93,7 +125,8 @@ var daysModule = function(){
       activities: day.activities,
       hotel: []
     };
-    if(day.hotel) simpleDay.hotel.push(day.hotel);
+    if(Array.isArray(day.hotel)) simpleDay.hotel = day.hotel;
+    else if(typeof day.hotel === 'object') simpleDay.hotel.push(day.hotel);
     return simpleDay;
   }
 
@@ -101,6 +134,7 @@ var daysModule = function(){
     mapModule.eraseMarkers();
     day = day || currentDay;
     var simpleDay = simplify(day);
+    console.log('simple day: ', simpleDay);
     Object.keys(simpleDay).forEach(function(type){
       var $list = $('#itinerary ul[data-type="' + type + '"]');
       $list.empty();
@@ -126,33 +160,7 @@ var daysModule = function(){
 
   return exports;
 
-};
+})();
 
-  var exports = {},
-      days,
-      currentDay;
 
-  $.get('/api/days', function(data){
-    if(!data.length) {
-       $.post('/api/days/0', function(day0){
-          days = data;
-          data.push(day0);
-          days.forEach(function(day){
-            if(!day.hotel) day.hotel = [];
-          });
-          daysModule = daysModule();
-          currentDay = days[0];
-      }).fail(function(err){
-          console.log(err.message);
-      });
-    }
-    else {
-      days = data;
-      days.forEach(function(day){
-        if(!day.hotel) day.hotel = [];
-      });
-      daysModule = daysModule();
-      currentDay = days[0];
-    }
-
-  });
+});
