@@ -18,6 +18,15 @@ router.get('/days/:dayNum',function(req, res, next){
   });
 });
 
+router.get('/days', function(req, res, next){
+  Day.find({}, function(err, days){
+    if(err) res.send(err.message);
+    else {
+      res.send(days);
+    }
+  });
+});
+
 router.get('/attractions/',function(req, res, next){
   var attractions = {};
 
@@ -61,7 +70,7 @@ router.post('/days/:dayNum',function(req, res, next){
   });
 });
 
-router.put('/days/:dayNum/:itemType',function(req, res, next){
+router.post('/days/:dayNum/:itemType',function(req, res, next){
   var itemType = req.params.itemType;
   Day.findOne({number: req.params.dayNum}, function(err, day){
     if(err) res.send(err.message);
@@ -79,6 +88,21 @@ router.put('/days/:dayNum/:itemType',function(req, res, next){
     }
   });
 });
+
+router.put('/days/:dayNum', function(req, res){
+  Day.findOne({number: req.params.dayNum}, function(err, day){
+    if(err) res.send(err.message);
+    else {
+      for(var i in req.body){
+        day[i] = req.body[i];
+      }
+      day.save(function(err, day){
+        if(err) res.send(err.message);
+        res.send(day);
+      });
+    }
+  })
+})
 
 router.delete('/days/:dayNum',function(req, res, next){
   Day.remove({number: req.params.dayNum}, function(err){

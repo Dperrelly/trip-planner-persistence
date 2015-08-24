@@ -13,7 +13,6 @@ $(document).ready(function() {
     attractionsByType.hotels = attractions.hotels;
     attractionsByType.restaurants = attractions.restaurants;
     attractionsByType.activities = attractions.activities;
-    console.log(attractionsByType);
   }).fail(function(err){
     console.log('failure');
   });
