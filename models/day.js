@@ -5,10 +5,10 @@ var ActivitySchema = require('./activity').schema;
 
 var DaySchema = new mongoose.Schema ({
     number: {type: Number, unique: true, required: true},
-    hotel: {type: mongoose.Schema.Types.ObjectId, ref: 'Hotel'},
-    restaurants: [{type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant'}],
-    activities: [{type: mongoose.Schema.Types.ObjectId, ref: 'Activity'}]
-})
+    hotel: {type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', unique: true},
+    restaurants: [{type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', unique: true}],
+    activities: [{type: mongoose.Schema.Types.ObjectId, ref: 'Activity', unique: true}]
+});
 // var day = mongoose.model('Day', DaySchema);
 // console.log('Dayday : ', day)
 

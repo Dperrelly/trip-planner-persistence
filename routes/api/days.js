@@ -19,7 +19,9 @@ router.get('/days/:dayNum',function(req, res, next){
 });
 
 router.get('/days', function(req, res, next){
-  Day.find({}, function(err, days){
+  Day.find({})
+  .populate('hotel restaurants activities')
+  .exec(function(err, days){
     if(err) res.send(err.message);
     else {
       res.send(days);
@@ -33,7 +35,6 @@ router.get('/attractions/',function(req, res, next){
   var hotelPromise = Hotel.find({}, function(err, hotels){
     if(err) res.send(err.message);
     else {
-      console.log(hotels);
       attractions.hotels = (hotels);
     }
   });
@@ -75,11 +76,11 @@ router.post('/days/:dayNum/:itemType',function(req, res, next){
   Day.findOne({number: req.params.dayNum}, function(err, day){
     if(err) res.send(err.message);
     else {
-      if(itemType === 'hotel'){
+      if(itemType === 'hotels'){
         day.hotel = req.body._id;
       }
       else if(itemType === 'restaurants' || itemType === 'activities'){
-        day[itemType].push(req.body._id);
+        if(day[itemType].indexOf(req.body._id) === -1) day[itemType].push(req.body._id);
       }
       day.save(function(err, day){
         if(err) res.send(err.message);
