@@ -30,13 +30,29 @@ router.post('/:dayNum',function(req, res, next){
   })
 })
 
-router.put('/:dayNum/itemType',function(req, res, next){
-
+router.put('/:dayNum/:itemType',function(req, res, next){
+  var itemType = req.params.itemType;
+  Day.findOne({number: req.params.dayNum}, function(err, day){
+    if(err) res.send(err.message);
+    else {
+      if(itemType === 'hotel'){
+        day.hotel = req.body._id;
+      }
+      else if(itemType === 'restaurants' || itemType === 'activities'){
+        day[itemType].push(req.body._id);
+      }
+      day.save(function(err, day){
+        if(err) res.send(err.message);
+        res.send(day);
+      });
+    }
+  })
 })
 
 router.delete('/:dayNum',function(req, res, next){
   Day.remove({number: req.params.dayNum}, function(err){
-    res.send(err.message);
+    if(err) res.send(err.message);
+    else res.send("Removed day: ", req.params.dayNum);
   })
 })
 
